@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Fact Back",
+  "description": "Scans your Facebook feed for misleading posts and allows for quick informative response to stem the tide of fake news.",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+       "matches": ["https://www.facebook.com/*"],
+       "css": ["content-script.css"],
+       "js": [ "content-script.js"]
+    }
+  ]
+}
