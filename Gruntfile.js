@@ -110,7 +110,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask('build', ['coffeelint', 'coffee', 'concat', 'sass', 'copy']);
+  grunt.registerTask('build', ['coffee', 'concat', 'sass', 'copy']);
   grunt.registerTask('debug', ['clean', 'build', 'watch'])
   grunt.registerTask('default', ['build']);
 };
