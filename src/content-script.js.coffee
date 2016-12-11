@@ -1,51 +1,120 @@
+EVIL_THRESHOLD = 30
+WARNING_THRESHOLD = 70
+POPOVER_PREAMBLE_EVIL = "This appears to be highly suspicions for the following reasons"
+POPOVER_PREAMBLE_WARNING = "This appears to be highly suspicions for the following reasons"
+
+parseQueryString = (href)=>
+  # console.log("PARSING = #{href}")
+  params = {}
+  urlParts = href.split('?')
+  return unless urlParts.length > 1
+  queryParts = urlParts[1].split('&')
+  _.each queryParts, (part, i)->
+    nameVal = part.split('=')
+    params[nameVal[0]] = decodeURIComponent(nameVal[1])
+
+  # console.log("PARAMS = #{JSON.stringify(params)}")
+  params
+
+pullUrlFromHref = (href)->
+  params = parseQueryString(href)
+  return unless params?
+
+  params['u']
+
+formatMessageItems = (messages)->
+  _.map(messages, (message)->
+    "<li>#{message}</li>"
+  ).join('')
+
+formatPopoverMessages = (preamble, messages)->
+  """
+  <strong>#{preamble}:</strong>
+  <ul>
+    #{formatMessageItems(messages)}
+  </ul>
+  """
+
+openPopover = (button, message)->
+  buttonOffset = button.offset()
+  popover = $('body').find('#fact_back_popover')
+  if popover.length == 0
+    $('body').append($("""
+      <div class="fact-back-popover" id="fact_back_popover">
+      </div>
+    """))
+    popover = $('body').find('#fact_back_popover')
+
+  popover.html(message).css(
+    top: "#{buttonOffset.top + 30}px"
+    left: "#{buttonOffset.left}px"
+  )
+
 checkFeed = ->
-  $('.userContentWrapper .lfloat a[href][target="_blank"]').each ->
-    if $(this).parents('.userContentWrapper').find('.fact-back-overlay').length == 0
-      console.log "Yoooooo"
-      httpGet("http://www.nytimes.com/2016/12/10/business/dealbook/how-the-twinkie-made-the-super-rich-even-richer.html", $(this))
-      $(this).parents('.lfloat').append("""
-        <div class="fact-back-overlay">
-          Yoooooooooo
-        </div>
-      """)
+  $('.userContentWrapper .mtm .lfloat a[href][target="_blank"]').each ->
+    anchor = $(this)
+    container = anchor.parents('.userContentWrapper')
 
-httpGet = (url, data) ->
-  server = 'https://localhost:3001/evaluate'
-  contents = '?ai=true&url='
+    if !container.data('factBacked')
+      container.data('factBacked', true)
+      url = pullUrlFromHref($(this).attr('href'))
 
-  link_url = server + contents + url
+      return unless url
 
-  fetch(link_url).then (response) ->
-    console.log "herer"
-    response.json().then (json) ->
-      `var score`
+      httpGet(url)
+      .then (data)->
+        return unless data.success
+        return unless data.ai.score <= WARNING_THRESHOLD
 
-      errorImgUrl = chrome.extension.getURL('/public/img/error.png')
-      checkedImgUrl = chrome.extension.getURL('/public/img/checked.png')
-      warningImgUrl = chrome.extension.getURL('/public/img/warning.png')
+        overlay = $("""
+          <div class="fact-back-overlay">
+          </div>
+        """)
 
-      div = document.createElement('div')
-      button = Ladda.create(div)
-      data.appendChild div
-
-      score = null
-
-      if json['success'] == true
-        ai_results = json['ai']
-        score = ai_results['score']
-        messages = ai_results['messages']
-        i = 0
-        while i < messages.length
-          console.log messages[i]
-          i++
-        if score >= 90
+        imgSrc = undefined
+        if data.ai.score <= EVIL_THRESHOLD
+          imgSrc = "/error.png"
+          overlay.addClass('fact-back-evil')
+          preamble = POPOVER_PREAMBLE_EVIL
         else
-        div.style = 'font-weight:bold; position:absolute; background:none; top: 4px; right: 30px; font-size: 20px; color: #444;'
-      else
-        score = Math.floor(Math.random() * 100)
-        div.style = 'background-color: #C6C8C2; color: #fff; font-size: 27px; position:absolute; top: 0px; left: 0px; width: 100%; height: 100%; opacity: 0.5;'
-      return
-  return
+          imgSrc = "/warning.png"
+          preamble = POPOVER_PREAMBLE_WARNING
+
+        button = $("""
+          <button>
+            <img src="#{chrome.extension.getURL(imgSrc)}">
+            <span class="fact-back-score">#{data.ai.score}</span>
+          </button>
+        """)
+        overlay.append(button)
+        anchor
+        .parents('.lfloat')
+        .append(overlay)
+        .find('button')
+        .click (event)->
+          event.stopPropagation()
+          openPopover(
+            $(this)
+            formatPopoverMessages(
+              preamble
+              data.ai.messages
+            )
+          )
+
+httpGet = (url, ai = 'true') ->
+  console.log("GET #{url}")
+  # fetch("https://localhost:3001/evaluate?ai=#{ai}&url=#{url}")
+  new Promise((resolve, reject)->
+    resolve(
+      success: true
+      ai:
+        score: 20
+        messages: ['George Soros', 'Disclaimer']
+    )
+  )
 
 $(document).ready checkFeed
 setInterval checkFeed, 1000
+$('body').on('click', ->
+  $('#fact_back_popover').remove()
+)
