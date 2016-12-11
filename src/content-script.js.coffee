@@ -24,7 +24,6 @@ updateUrlParams = (e) ->
     output.innerHTML = e.newValue
 
 parseQueryString = (href)->
-  # console.log("PARSING = #{href}")
   params = {}
   urlParts = href.split('?')
   return unless urlParts.length > 1
@@ -33,7 +32,6 @@ parseQueryString = (href)->
     nameVal = part.split('=')
     params[nameVal[0]] = decodeURIComponent(nameVal[1])
 
-  # console.log("PARAMS = #{JSON.stringify(params)}")
   params
 
 pullUrlFromHref = (href)->
@@ -125,7 +123,7 @@ buttonIcon = (tone)->
 
 apiUrl = (href, ai = 'true')->
   return unless href?
-  "/evaluate?ai=#{ai}&url=#{href}"
+  "#{API_HOST}/evaluate?ai=#{ai}&url=#{href}"
 
 checkFeed = ->
   $('.userContentWrapper .mtm .lfloat a[href][target="_blank"]').each ->
@@ -137,15 +135,6 @@ checkFeed = ->
       url = apiUrl(pullUrlFromHref($(this).attr('href')))
 
       return unless url?
-
-      console.log("checking for set presents mode now...")
-
-      if localStorage.getItem('ai')
-        console.log(localStorage.getItem('ai'))
-      else
-        console.log("Oops.. not AI found")
-
-      console.log("local storage done.")
 
       cachedGet(url)
       .then (data)->
@@ -184,6 +173,8 @@ checkFeed = ->
             tone
             data.reasons
           )
+      .catch (error)->
+        console.log("ERROR #{JSON.stringify(error)}")
 
 cachedGet = (url)->
   if fetchCache[url]
