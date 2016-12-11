@@ -138,7 +138,7 @@ fetchApiUrl = (href, fn)->
       _.map(
         _.slice(SETTINGS, 1)
         (setting, i)->
-          "lenses[]=#{i+2}" if items[setting]
+          "lenses[]=#{i+1}" if items[setting]
       )
     ).join('&')
 
