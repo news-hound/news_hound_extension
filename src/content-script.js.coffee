@@ -17,6 +17,11 @@ fetchCache = {}
 closePopup = ->
   $('#fact_back_popover').remove()
 
+updateUrlParams = (e) ->
+    if (e.key == 'storage-event')
+        output.innerHTML = e.newValue;
+
+
 parseQueryString = (href)=>
   # console.log("PARSING = #{href}")
   params = {}
@@ -121,6 +126,15 @@ checkFeed = ->
 
       return unless url?
 
+      console.log("checking for set presents mode now...")
+
+      if localStorage.getItem('ai')
+        console.log(localStorage.getItem('ai'))
+      else
+        console.log("Oops.. not AI found")
+
+      console.log("local storage done.")
+
       cachedGet(url)
       .then (data)->
         return unless data.success
@@ -170,6 +184,7 @@ cachedGet = (url, ai = 'true')->
 
 httpGet = (url, ai = 'true') ->
   console.log("httpGet #{url}")
+
   # fetch("https://localhost:3001/evaluate?ai=#{ai}&url=#{url}")
   Promise.resolve(
     success: true
@@ -187,4 +202,5 @@ httpGet = (url, ai = 'true') ->
 
 $(document).ready checkFeed
 setInterval checkFeed, 1000
+window.addEventListener("storage", checkFeed, true);
 $('body').on('click', closePopup)
