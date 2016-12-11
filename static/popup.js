@@ -1,3 +1,3 @@
-$('#inputRowCheckbox').click(function() {
-    console.log("BOOM!!!")
+$('#inputRowCheckbox').on('change' , function(){
+    console.log("clicked")
 });
