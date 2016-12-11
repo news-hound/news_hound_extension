@@ -11,6 +11,8 @@ popupIcons =
   warning: "fa-exclamation-triangle"
   noopinion: "fa-info"
 
+fetchCache = {}
+
 closePopup = ->
   $('#fact_back_popover').remove()
 
@@ -33,22 +35,45 @@ pullUrlFromHref = (href)->
 
   params['u']
 
-formatMessageItems = (messages)->
-  _.map(messages, (message)->
-    "<li>#{message}</li>"
+formatReference = (reason)->
+  return ''
+  """
+    <a class="info" href="#{reason.reference}" target="_blank">
+      <i class="fa fa-info"></i>
+    </a>
+  """
+
+formatAuthor = (reason)->
+  return ''
+  """
+  &nbsp;(#{reason.author})
+  """
+
+formatReason = (reason)->
+  """
+  <li>
+    #{reason.body}
+    #{formatAuthor(reason)}
+    #{formatReference(reason)}
+  </li>
+  """
+
+formatReasons = (reasons)->
+  _.map(reasons, (reason)->
+    formatReason(reason)
   ).join('')
 
-formatPopoverMessages = (tone, messages)->
+formatPopover = (tone, messages)->
   """
   <strong>#{popupMessages[tone]}</strong>
   <ul>
-    #{formatMessageItems(messages)}
+    #{formatReasons(messages)}
   </ul>
   """
 
 openPopover = (button, tone, messages)->
   closePopup()
-  message = formatPopoverMessages(tone, messages)
+  message = formatPopover(tone, messages)
   buttonOffset = button.offset()
   popover = $('body').find('#fact_back_popover')
   if popover.length == 0
@@ -65,7 +90,7 @@ openPopover = (button, tone, messages)->
 
 buttonScore = (tone, data)->
   return '' if tone == 'noopinion'
-  "<span class=\"fact-back-score\">#{data.ai.score}</span>"
+  "<span class=\"fact-back-score\">#{data.score}</span>"
 
 buttonIcon = (tone)->
   "<i class=\"fa #{popupIcons[tone]}\"></i>"
@@ -81,7 +106,7 @@ checkFeed = ->
 
       return unless url
 
-      httpGet(url)
+      cachedGet(url)
       .then (data)->
         return unless data.success
 
@@ -91,9 +116,9 @@ checkFeed = ->
         """)
 
         imgSrc = undefined
-        if data.ai.score <= EVIL_THRESHOLD
+        if data.score <= EVIL_THRESHOLD
           tone = 'evil'
-        else if data.ai.score <= WARNING_THRESHOLD
+        else if data.score <= WARNING_THRESHOLD
           tone = 'warning'
         else
           tone = 'noopinion'
@@ -116,18 +141,33 @@ checkFeed = ->
           openPopover(
             $(this)
             tone
-            data.ai.messages
+            data.reasons
           )
 
+cachedGet = (url, ai = 'true')->
+  if fetchCache[url]
+    Promise.resolve(fetchCache[url])
+  else
+    httpGet(url, ai)
+    .then (data)->
+      fetchCache[url] = data
+      data
+
 httpGet = (url, ai = 'true') ->
+  console.log("httpGet #{url}")
   # fetch("https://localhost:3001/evaluate?ai=#{ai}&url=#{url}")
-  new Promise((resolve, reject)->
-    resolve(
-      success: true
-      ai:
-        score: _.random(0, 100)
-        messages: ['George Soros', 'Disclaimer']
-    )
+  Promise.resolve(
+    success: true
+    score: _.random(0, 100)
+    reasons: [
+      body: 'Not scientifically accurate'
+      author: 'Monte'
+      reference: 'http://www.scientificamerican.com/'
+    ,
+      body: 'This domain has been blacklisted by Snopes'
+      author: 'Snopes'
+      reference: 'http://www.snopes.com'
+    ]
   )
 
 $(document).ready checkFeed
