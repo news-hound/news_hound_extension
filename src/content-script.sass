@@ -67,22 +67,19 @@ $purple: #3a428b
   font-size: 14px
   width: 428px
 
+  ul
+    margin: 10px 0px
+
+  li
+    margin-bottom: 5px
+
   &.evil
     border-color: $red
 
   &.warning
     border-color: $yellow
 
-  ul
-    list-style-type: circle
-    margin: 10px 0
-
-  li
-    list-style-type: circle
-    margin: 5px 0
-
   .media
-    margin-top: 15px
     display: table
 
   .media:first-child
@@ -96,6 +93,11 @@ $purple: #3a428b
     display: table-cell
     width: 10000px
 
+  .media-left
+    padding-right: 10px
+    display: table-cell
+    vertical-align: top
+
   .media-right
     padding-left: 10px
     display: table-cell
@@ -103,6 +105,9 @@ $purple: #3a428b
 
   i.fa-info-circle
     font-size: 20px
+
+  i.fa-circle
+    font-size: 12px
 
 .fact-back-share-frame
   color: white

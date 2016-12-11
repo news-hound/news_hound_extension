@@ -64,6 +64,9 @@ formatReason = (reason)->
   """
   <li>
     <div class="media">
+      <div class="media-left">
+        <i class="fa fa-circle"></i>
+      </div>
       <div class="media-body">
         #{reason.body}
         #{formatAuthor(reason)}
