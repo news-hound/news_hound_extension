@@ -132,28 +132,19 @@ buttonIcon = (tone)->
   "<i class=\"fa #{popupIcons[tone]}\"></i>"
 
 fetchApiUrl = (href, fn)->
-  console.log("getting the keys now..")
-
   chrome.storage.sync.get SETTINGS, (items) ->
     ai = items['newshound']
-    console.log(ai)
-
     lenses = _.compact(
       _.map(
         _.slice(SETTINGS, 1)
-        console.log(items)
         (setting, i)->
-          console.log(setting)
-          console.log(i)
           "lenses[]=#{i+2}" if items[setting]
       )
     ).join('&')
 
-    fn("#{API_HOST}/evaluate?ai=#{ai}&url=#{href}&lenses[]=1&lenses[]=2&lenses[]=1&lenses[]=1")
+    fn("#{API_HOST}/evaluate?ai=#{ai}&url=#{href}&#{lenses}")
 
 checkFeed = ->
-  console.log("Fetching the params now...")
-
   $('.userContentWrapper .mtm .lfloat a[href][target="_blank"]').each ->
     anchor = $(this)
     container = anchor.parents('.userContentWrapper')
