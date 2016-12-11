@@ -1,12 +1,12 @@
 EVIL_THRESHOLD = 30
-WARNING_THRESHOLD = 70
+WARNING_THRESHOLD = 80
 API_HOST = "https://news-hound-api.herokuapp.com"
 
 strings =
   popupMessages:
     evil: "This appears to be highly suspicions for the following reasons:"
     warning: "This appears to be highly suspicions for the following reasons:"
-    noopinion: "We have not identified this as false.  Here is what we know:"
+    noopinion: "We have not yet identified this as false."
   commentPrompt: 'Maybe add a comment? How about starting with...'
 
 popupIcons =
@@ -69,10 +69,16 @@ formatReason = (reason)->
   </li>
   """
 
-formatReasons = (reasons)->
-  _.map(reasons, (reason)->
+formatReasons = (tone, reasons)->
+  return '' if tone == 'noopinion'
+  items = _.map(reasons, (reason)->
     formatReason(reason)
   ).join('')
+  """
+  <ul>
+    #{items}
+  </ul>
+  """
 
 formatShareText = (tone, reasons)->
   reasons = _.map(reasons, 'body').join(', ')
@@ -92,9 +98,7 @@ formatShareFrame = (tone, reasons)->
 formatPopoverContent = (tone, reasons)->
   """
   <strong>#{strings.popupMessages[tone]}</strong>
-  <ul>
-    #{formatReasons(reasons)}
-  </ul>
+  #{formatReasons(tone, reasons)}
   #{formatShareFrame(tone, reasons)}
   """
 
@@ -138,6 +142,7 @@ checkFeed = ->
 
       cachedGet(url)
       .then (data)->
+        console.log "DATA: #{JSON.stringify(data)}"
         return unless data.success
 
         overlay = $("""
@@ -171,37 +176,41 @@ checkFeed = ->
           openPopover(
             $(this)
             tone
-            data.reasons
+            data.messages
           )
       .catch (error)->
-        console.log("ERROR #{JSON.stringify(error)}")
+        console.log("ERROR #{error}")
 
 cachedGet = (url)->
   if fetchCache[url]
     Promise.resolve(fetchCache[url])
   else
     httpGet(url)
+    .then (response)->
+      console.log("RESPONSE: #{response}")
+      response.json()
     .then (data)->
+      console.log("DATA: #{JSON.stringify(data)}")
       fetchCache[url] = data
-      data
+      Promise.resolve(data)
 
 httpGet = (url) ->
   console.log("httpGet #{url}")
 
-  # fetch(url)
-  Promise.resolve(
-    success: true
-    score: _.random(0, 100)
-    reasons: [
-      body: 'Not scientifically accurate'
-      author: 'Monte'
-      reference: 'http://www.scientificamerican.com/'
-    ,
-      body: 'This domain has been blacklisted by Snopes'
-      author: 'Snopes'
-      reference: 'http://www.snopes.com'
-    ]
-  )
+  fetch(url)
+  # Promise.resolve(
+  #   success: true
+  #   score: _.random(0, 100)
+  #   reasons: [
+  #     body: 'Not scientifically accurate'
+  #     author: 'Monte'
+  #     reference: 'http://www.scientificamerican.com/'
+  #   ,
+  #     body: 'This domain has been blacklisted by Snopes'
+  #     author: 'Snopes'
+  #     reference: 'http://www.snopes.com'
+  #   ]
+  # )
 
 $(document).ready checkFeed
 setInterval checkFeed, 1000
