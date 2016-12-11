@@ -1,5 +1,6 @@
 EVIL_THRESHOLD = 30
 WARNING_THRESHOLD = 70
+API_HOST = "https://localhost:3001"
 
 popupMessages =
   evil: "This appears to be highly suspicions for the following reasons:"
@@ -35,18 +36,18 @@ pullUrlFromHref = (href)->
 
   params['u']
 
-formatReference = (reason)->
-  return ''
-  """
-    <a class="info" href="#{reason.reference}" target="_blank">
-      <i class="fa fa-info"></i>
-    </a>
-  """
-
 formatAuthor = (reason)->
-  return ''
+  return '' unless reason.author?
   """
   &nbsp;(#{reason.author})
+  """
+
+formatReference = (reason)->
+  return '' unless reason.reference?
+  """
+    <a class="info" href="#{reason.reference}" target="_blank">
+      <i class="fa fa-info-circle"></i>
+    </a>
   """
 
 formatReason = (reason)->
@@ -63,30 +64,40 @@ formatReasons = (reasons)->
     formatReason(reason)
   ).join('')
 
-formatPopover = (tone, messages)->
+formatShareText = (tone, reasons)->
+  reasons = _.map(reasons, 'body').join(', ')
+  "#{popupMessages[tone]} #{reasons}"
+
+formatPopoverContent = (tone, reasons)->
   """
   <strong>#{popupMessages[tone]}</strong>
   <ul>
-    #{formatReasons(messages)}
+    #{formatReasons(reasons)}
   </ul>
+  <div class="fact-back-share-frame">
+    <strong>Maybe add a comment?</strong>
+    <div>
+      <textarea>
+        #{formatShareText(tone, reasons)}
+      </textarea>
+    </div>
+  </div>
   """
 
-openPopover = (button, tone, messages)->
+openPopover = (button, tone, reasons)->
   closePopup()
-  message = formatPopover(tone, messages)
   buttonOffset = button.offset()
-  popover = $('body').find('#fact_back_popover')
-  if popover.length == 0
-    $('body').append($("""
-      <div class="fact-back-popover #{tone}" id="fact_back_popover">
-      </div>
-    """))
-    popover = $('body').find('#fact_back_popover')
-
-  popover.html(message).css(
+  popover = $("""
+    <div class="fact-back-popover" id="fact_back_popover">
+    </div>
+  """)
+  popover.html(
+    formatPopoverContent(tone, reasons)
+  ).css(
     top: "#{buttonOffset.top + 25}px"
     left: "#{buttonOffset.left}px"
-  )
+  ).addClass(tone)
+  $('body').append(popover)
 
 buttonScore = (tone, data)->
   return '' if tone == 'noopinion'
@@ -95,6 +106,10 @@ buttonScore = (tone, data)->
 buttonIcon = (tone)->
   "<i class=\"fa #{popupIcons[tone]}\"></i>"
 
+apiUrl = (href)->
+  return unless href?
+  "/evaluate?ai=#{ai}&url=#{href}"
+
 checkFeed = ->
   $('.userContentWrapper .mtm .lfloat a[href][target="_blank"]').each ->
     anchor = $(this)
@@ -102,9 +117,9 @@ checkFeed = ->
 
     if !container.data('factBacked')
       container.data('factBacked', true)
-      url = pullUrlFromHref($(this).attr('href'))
+      url = apiUrl(pullUrlFromHref($(this).attr('href')))
 
-      return unless url
+      return unless url?
 
       cachedGet(url)
       .then (data)->
