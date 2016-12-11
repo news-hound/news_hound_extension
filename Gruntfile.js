@@ -49,7 +49,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'static',
-            src: '*',
+            src: '**/*',
             dest: 'build/'
           }
         ]

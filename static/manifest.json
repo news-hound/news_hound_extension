@@ -14,7 +14,7 @@
   "content_scripts": [
     {
        "matches": ["https://www.facebook.com/*"],
-       "css": ["content-script.css"],
+       "css": ["css/font-awesome.css", "content-script.css"],
        "js": [ "content-script.js"]
     }
   ],

@@ -1,7 +1,18 @@
 EVIL_THRESHOLD = 30
 WARNING_THRESHOLD = 70
-POPOVER_PREAMBLE_EVIL = "This appears to be highly suspicions for the following reasons"
-POPOVER_PREAMBLE_WARNING = "This appears to be highly suspicions for the following reasons"
+
+popupMessages =
+  evil: "This appears to be highly suspicions for the following reasons:"
+  warning: "This appears to be highly suspicions for the following reasons:"
+  noopinion: "We have not identified this as false.  Here is what we know:"
+
+popupIcons =
+  evil: "fa-exclamation-triangle"
+  warning: "fa-exclamation-triangle"
+  noopinion: "fa-info"
+
+closePopup = ->
+  $('#fact_back_popover').remove()
 
 parseQueryString = (href)=>
   # console.log("PARSING = #{href}")
@@ -27,28 +38,37 @@ formatMessageItems = (messages)->
     "<li>#{message}</li>"
   ).join('')
 
-formatPopoverMessages = (preamble, messages)->
+formatPopoverMessages = (tone, messages)->
   """
-  <strong>#{preamble}:</strong>
+  <strong>#{popupMessages[tone]}</strong>
   <ul>
     #{formatMessageItems(messages)}
   </ul>
   """
 
-openPopover = (button, message)->
+openPopover = (button, tone, messages)->
+  closePopup()
+  message = formatPopoverMessages(tone, messages)
   buttonOffset = button.offset()
   popover = $('body').find('#fact_back_popover')
   if popover.length == 0
     $('body').append($("""
-      <div class="fact-back-popover" id="fact_back_popover">
+      <div class="fact-back-popover #{tone}" id="fact_back_popover">
       </div>
     """))
     popover = $('body').find('#fact_back_popover')
 
   popover.html(message).css(
-    top: "#{buttonOffset.top + 30}px"
+    top: "#{buttonOffset.top + 25}px"
     left: "#{buttonOffset.left}px"
   )
+
+buttonScore = (tone, data)->
+  return '' if tone == 'noopinion'
+  "<span class=\"fact-back-score\">#{data.ai.score}</span>"
+
+buttonIcon = (tone)->
+  "<i class=\"fa #{popupIcons[tone]}\"></i>"
 
 checkFeed = ->
   $('.userContentWrapper .mtm .lfloat a[href][target="_blank"]').each ->
@@ -64,7 +84,6 @@ checkFeed = ->
       httpGet(url)
       .then (data)->
         return unless data.success
-        return unless data.ai.score <= WARNING_THRESHOLD
 
         overlay = $("""
           <div class="fact-back-overlay">
@@ -73,17 +92,18 @@ checkFeed = ->
 
         imgSrc = undefined
         if data.ai.score <= EVIL_THRESHOLD
-          imgSrc = "/error.png"
-          overlay.addClass('fact-back-evil')
-          preamble = POPOVER_PREAMBLE_EVIL
+          tone = 'evil'
+        else if data.ai.score <= WARNING_THRESHOLD
+          tone = 'warning'
         else
-          imgSrc = "/warning.png"
-          preamble = POPOVER_PREAMBLE_WARNING
+          tone = 'noopinion'
+
+        overlay.addClass(tone)
 
         button = $("""
           <button>
-            <img src="#{chrome.extension.getURL(imgSrc)}">
-            <span class="fact-back-score">#{data.ai.score}</span>
+            #{buttonIcon(tone)}
+            #{buttonScore(tone, data)}
           </button>
         """)
         overlay.append(button)
@@ -95,26 +115,21 @@ checkFeed = ->
           event.stopPropagation()
           openPopover(
             $(this)
-            formatPopoverMessages(
-              preamble
-              data.ai.messages
-            )
+            tone
+            data.ai.messages
           )
 
 httpGet = (url, ai = 'true') ->
-  console.log("GET #{url}")
   # fetch("https://localhost:3001/evaluate?ai=#{ai}&url=#{url}")
   new Promise((resolve, reject)->
     resolve(
       success: true
       ai:
-        score: 20
+        score: _.random(0, 100)
         messages: ['George Soros', 'Disclaimer']
     )
   )
 
 $(document).ready checkFeed
 setInterval checkFeed, 1000
-$('body').on('click', ->
-  $('#fact_back_popover').remove()
-)
+$('body').on('click', closePopup)
