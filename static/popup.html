@@ -6,33 +6,45 @@
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" type="text/css" href="popup.css">
 
-    <script src="jquery/dist/jquery.min.js"></script>
+    <script src="jquery/dist/jquery.js"></script>
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="popup.js"></script>
   </head>
 
   <body>
-  <div class="mainContainer">
-    <div id="fh5co-page">
-
-      <header id="fh5co-header" role="banner">
-        <div class="container">
-          <div class="header-inner">
-            <h1><a href="popup.html">News Hound</a></h1>
-            <nav role="navigation">
-              <ul>
-                <li id="showServices"><a href="#">Services</a></li>
-                <li class="cta" id="openContactUs"><a href="">Contact Us</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
+    <div class="main-container">
+      <header>
+        <h1 class="text-center">
+          <a id="openContactUs" href="#">NewsHound</a>
+        </h1>
       </header>
-
-      <div id="page-body"></div>
-
+      <div class="main-content">
+        <h3 class="text-center">Lenses</h3>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="None" id="inputRowCheckbox1" name="check">
+            NewsHound
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="1" id="inputRowCheckbox2" name="check">
+            Snopes
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="2" id="inputRowCheckbox3" name="check">
+            Real or Satire
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="3" id="inputRowCheckbox4" name="check">
+            Politifact
+          </label>
+        </div>
+      </div>
     </div>
-  </div>
   </body>
 </html>
-
