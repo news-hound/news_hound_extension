@@ -2,31 +2,37 @@
 <html>
   <head>
     <title>Fact Back!</title>
+    <link rel="stylesheet" media="screen" href="css/bootstrap.css">
+    <link rel="stylesheet" href="/css/icomoon.css">
     <link rel="stylesheet" type="text/css" href="popup.css">
+
     <script src="jquery/dist/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     <script src="popup.js"></script>
   </head>
+
   <body>
-    <div class="container">
+  <div class="mainContainer">
+    <div id="fh5co-page">
 
-      <div class="header">
-        <img class="headerLogo" src="logo1.png" alt="Ronin Logo" height="120" width="120">
-        <h1 class="headerTitle">Ronin</h1>
-      </div>
+      <header id="fh5co-header" role="banner">
+        <div class="container">
+          <div class="header-inner">
+            <h1><a href="popup.html">News Hound</a></h1>
+            <nav role="navigation">
+              <ul>
+                <li id="showServices"><a href="#">Services</a></li>
+                <li class="cta" id="openContactUs"><a href="">Contact</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </header>
 
-      <div class="body">
-        <div class="inputRow">
-          <input type="checkbox" value="None" id="inputRowCheckbox1" name="check" />
-          <label for="inputRowlabel">Enable AI Mode</label>
-        </div>
-        <br />
-        <div class="inputRow">
-          <input type="checkbox" value="None" id="inputRowCheckbox2" name="check" />
-          <label for="inputRowlabel">Snopes Lense</label>
-        </div>
-      </div>
+      <div id="page-body"></div>
 
     </div>
+  </div>
   </body>
 </html>
 
