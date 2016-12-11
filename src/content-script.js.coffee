@@ -111,7 +111,7 @@ buttonScore = (tone, data)->
 buttonIcon = (tone)->
   "<i class=\"fa #{popupIcons[tone]}\"></i>"
 
-apiUrl = (href)->
+apiUrl = (href, ai = 'true')->
   return unless href?
   "/evaluate?ai=#{ai}&url=#{href}"
 
@@ -173,7 +173,7 @@ checkFeed = ->
             data.reasons
           )
 
-cachedGet = (url, ai = 'true')->
+cachedGet = (url)->
   if fetchCache[url]
     Promise.resolve(fetchCache[url])
   else
@@ -182,7 +182,7 @@ cachedGet = (url, ai = 'true')->
       fetchCache[url] = data
       data
 
-httpGet = (url, ai = 'true') ->
+httpGet = (url) ->
   console.log("httpGet #{url}")
 
   # fetch("https://localhost:3001/evaluate?ai=#{ai}&url=#{url}")
