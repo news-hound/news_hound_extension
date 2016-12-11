@@ -10,34 +10,8 @@ module.exports = function(grunt) {
         flatten: false,
         cwd: 'src',
         src: "content-script.js.coffee",
-        dest: 'tmp',
+        dest: 'build',
         ext: '.js'
-      },
-      popup: {
-        expand: true,
-        flatten: false,
-        cwd: 'src',
-        src: "popup.js.coffee",
-        dest: 'tmp',
-        ext: '.js'
-      }
-    },
-    concat: {
-      contentScript: {
-        src: [
-          'bower_components/jquery/dist/jquery.js',
-          'bower_components/lodash/lodash.js',
-          'tmp/content-script.js'
-        ],
-        dest: 'build/content-script.js'
-      },
-      popup: {
-        src: [
-          'bower_components/jquery/dist/jquery.js',
-          'bower_components/lodash/lodash.js',
-          'tmp/popup.js'
-        ],
-        dest: 'build/popup.js'
       }
     },
     clean: {
@@ -49,6 +23,12 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'static',
+            src: '**/*',
+            dest: 'build/'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components',
             src: '**/*',
             dest: 'build/'
           }

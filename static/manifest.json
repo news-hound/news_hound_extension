@@ -15,7 +15,7 @@
     {
        "matches": ["https://www.facebook.com/*"],
        "css": ["css/font-awesome.css", "content-script.css"],
-       "js": [ "content-script.js"]
+       "js": [ "jquery/dist/jquery.min.js", "lodash/dist/lodash.min.js", "content-script.js"]
     }
   ],
   "web_accessible_resources": [
