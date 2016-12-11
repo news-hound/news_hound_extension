@@ -1,0 +1,70 @@
+.container {
+  height: 325px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f2f2f2;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+.headerTitle {
+  font-size: 40px;
+  padding: 20px;
+}
+
+.headerLogo {
+  padding: 20px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputRow {
+  padding: 20px;
+  font-size: 24px;
+  background-color: #e6e6e6;
+}
+
+.inputRowlabel {
+  padding: 20px;
+}
+
+input[type='checkbox'] {
+  -webkit-appearance:none;
+  width:24px;
+  height:24px;
+  background:white;
+  border-radius:5px;
+  border:2px solid #555;
+  padding-right: 10px;
+}
+
+input[type='checkbox']:checked {
+    background: #000;
+}
+
+input[type=submit] {
+  width:24px;
+  height:24px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+}
+
+.selectAllButton {
+  padding-left: 50px;
+  justify-content: flex-start;
+}
+
+.clearAllButton {
+  padding-left: 20px;
+  justify-content: flex-end;
+}

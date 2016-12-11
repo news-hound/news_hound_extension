@@ -2,12 +2,34 @@
 <html>
   <head>
     <title>Fact Back!</title>
-    <style>
-    </style>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
     <script src="popup.js"></script>
   </head>
   <body>
-    Fact Back!
+    <div class="container">
+
+      <div class="header">
+        <img class="headerLogo" src="logo1.png" alt="Ronin Logo" height="120" width="120">
+        <h1 class="headerTitle">Ronin</h1>
+      </div>
+
+      <div class="body">
+        <div class="inputRow">
+          <input type="checkbox" value="None" id="inputRowCheckbox" name="check" />
+          <label for="inputRowlabel">Enable AI Mode</label>
+        </div>
+        <br />
+        <div class="inputRow">
+          <input type="checkbox" value="None" id="inputRowCheckbox" name="check" />
+          <label for="inputRowlabel">Snopes Lense</label>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
   </body>
 </html>
 
