@@ -1,6 +1,12 @@
 EVIL_THRESHOLD = 30
 WARNING_THRESHOLD = 80
 API_HOST = "https://news-hound-api.herokuapp.com"
+SETTINGS = [
+  'newshound'
+  'snopes'
+  'real_or_satire'
+  'politifact'
+]
 
 strings =
   popupMessages:
@@ -125,61 +131,80 @@ buttonScore = (tone, data)->
 buttonIcon = (tone)->
   "<i class=\"fa #{popupIcons[tone]}\"></i>"
 
-apiUrl = (href, ai = 'true')->
-  return unless href?
-  "#{API_HOST}/evaluate?ai=#{ai}&url=#{href}"
+fetchApiUrl = (href, fn)->
+  console.log("getting the keys now..")
+
+  chrome.storage.sync.get SETTINGS, (items) ->
+    ai = items['newshound']
+    console.log(ai)
+
+    lenses = _.compact(
+      _.map(
+        _.slice(SETTINGS, 1)
+        console.log(items)
+        (setting, i)->
+          console.log(setting)
+          console.log(i)
+          "lenses[]=#{i+2}" if items[setting]
+      )
+    ).join('&')
+
+    fn("#{API_HOST}/evaluate?ai=#{ai}&url=#{href}&lenses[]=1&lenses[]=2&lenses[]=1&lenses[]=1")
 
 checkFeed = ->
+  console.log("Fetching the params now...")
+
   $('.userContentWrapper .mtm .lfloat a[href][target="_blank"]').each ->
     anchor = $(this)
     container = anchor.parents('.userContentWrapper')
 
     if !container.data('factBacked')
       container.data('factBacked', true)
-      url = apiUrl(pullUrlFromHref($(this).attr('href')))
+      console.log("Fetching the params now...")
+      fetchApiUrl pullUrlFromHref($(this).attr('href')), (url)->
 
-      return unless url?
+        return unless url?
 
-      cachedGet(url)
-      .then (data)->
-        console.log "DATA: #{JSON.stringify(data)}"
-        return unless data.success
+        cachedGet(url)
+        .then (data)->
+          console.log "DATA: #{JSON.stringify(data)}"
+          return unless data.success
 
-        overlay = $("""
-          <div class="fact-back-overlay">
-          </div>
-        """)
+          overlay = $("""
+            <div class="fact-back-overlay">
+            </div>
+          """)
 
-        imgSrc = undefined
-        if data.score <= EVIL_THRESHOLD
-          tone = 'evil'
-        else if data.score <= WARNING_THRESHOLD
-          tone = 'warning'
-        else
-          tone = 'noopinion'
+          imgSrc = undefined
+          if data.score <= EVIL_THRESHOLD
+            tone = 'evil'
+          else if data.score <= WARNING_THRESHOLD
+            tone = 'warning'
+          else
+            tone = 'noopinion'
 
-        overlay.addClass(tone)
+          overlay.addClass(tone)
 
-        button = $("""
-          <button>
-            #{buttonIcon(tone)}
-            #{buttonScore(tone, data)}
-          </button>
-        """)
-        overlay.append(button)
-        anchor
-        .parents('.lfloat')
-        .append(overlay)
-        .find('button')
-        .mouseover (event)->
-          event.stopPropagation()
-          openPopover(
-            $(this)
-            tone
-            data.messages
-          )
-      .catch (error)->
-        console.log("ERROR #{error}")
+          button = $("""
+            <button>
+              #{buttonIcon(tone)}
+              #{buttonScore(tone, data)}
+            </button>
+          """)
+          overlay.append(button)
+          anchor
+          .parents('.lfloat')
+          .append(overlay)
+          .find('button')
+          .mouseover (event)->
+            event.stopPropagation()
+            openPopover(
+              $(this)
+              tone
+              data.messages
+            )
+        .catch (error)->
+          console.log("ERROR #{error}")
 
 cachedGet = (url)->
   if fetchCache[url]
