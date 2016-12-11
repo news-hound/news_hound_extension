@@ -1,28 +1,43 @@
-function checkSetting(key) {
-  return localStorage.getItem(key) == 'true'
+function checkSetting(key, callback) {
+  chrome.storage.sync.get(key, function(item) {
+    callback (item);
+  });
 }
 
 $( document ).ready(function() {
 
-  $('#inputRowCheckbox1').change(function() {
-    localStorage.setItem("newshound", this.checked);
-  })
-  .prop('checked', checkSetting('newshound'));
+  function setValues(value) {
+    var key = Object.keys(value)[0]
+    $('#' + key).prop('checked', value[key]);
+  }
 
-  $('#inputRowCheckbox2').change(function() {
-    localStorage.setItem("snopes", this.checked);
+  $('#newshound').change(function() {
+    chrome.storage.sync.set({"newshound": this.checked}, function() {
+      console.log('Settings saved');
+    });
   })
-  .prop('checked', checkSetting('snopes'));
+  .prop('checked', checkSetting('newshound', setValues));
 
-  $('#inputRowCheckbox3').change(function() {
-    localStorage.setItem("real_or_satire", this.checked);
+  $('#snopes').change(function() {
+    chrome.storage.sync.set({"snopes": this.checked}, function() {
+      console.log('Settings saved');
+    });
   })
-  .prop('checked', checkSetting('real_or_satire'));
+  .prop('checked', checkSetting('snopes', setValues));
 
-  $('#inputRowCheckbox4').change(function() {
-    localStorage.setItem("politifact", this.checked);
+  $('#real_or_satire').change(function() {
+    chrome.storage.sync.set({"real_or_satire": this.checked}, function() {
+      console.log('Settings saved');
+    });
   })
-  .prop('checked', checkSetting('politifact'));
+  .prop('checked', checkSetting('real_or_satire', setValues));
+
+  $('#politifact').change(function() {
+    chrome.storage.sync.set({"politifact": this.checked}, function() {
+      console.log('Settings saved');
+    });
+  })
+  .prop('checked', checkSetting('politifact', setValues));
 
   $('#openContactUs').click(function() {
     var win = window.open("https://htmlpreview.github.io/?https://github.com/madhurxyz/Ronin/blob/master/index.html#contact", '_blank');

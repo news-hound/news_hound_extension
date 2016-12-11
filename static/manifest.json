@@ -19,7 +19,7 @@
         "css/font-awesome.css",
         "content-script.css"
       ],
-      "js": [ 
+      "js": [
         "jquery/dist/jquery.min.js",
         "lodash/dist/lodash.min.js",
         "bootstrap/dist/js/bootstrap.js",
