@@ -17,5 +17,16 @@
        "css": ["content-script.css"],
        "js": [ "content-script.js"]
     }
+  ],
+  "web_accessible_resources": [
+    "/warning.png",
+    "/checked.png",
+    "/error.png",
+    "/fonts/fontawesome-webfont.eot",
+    "/fonts/fontawesome-webfont.svg",
+    "/fonts/fontawesome-webfont.ttf",
+    "/fonts/fontawesome-webfont.woff",
+    "/fonts/fontawesome-webfont.woff2",
+    "/fonts/FontAwesome.otf"
   ]
 }
