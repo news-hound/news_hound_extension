@@ -25,7 +25,7 @@ $purple: #3a428b
     left: 10px
     background-color: $purple
     font-size: 18px
-    box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75)
+    box-shadow: 4px 4px 3px -3px rgba(0,0,0,0.75)
 
     &:focus
       outline: none
@@ -61,9 +61,11 @@ $purple: #3a428b
   background-color: white
   border-radius: 0px 4px 4px 4px
   border: solid 4px $purple
-  box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.75)
-  font-family: TimesNewRoman,"Times New Roman",Times,Baskerville,Georgia,serif !important
-  font-size: 16px
+  box-shadow: 4px 4px 3px -3px rgba(0,0,0,0.75)
+  box-shadow-top: none
+  font-family: Verdana, Geneva, sans-serif !important
+  font-size: 14px
+  width: 428px
 
   &.evil
     border-color: $red
@@ -71,14 +73,18 @@ $purple: #3a428b
   &.warning
     border-color: $yellow
 
-  a.info
-    display: inline-block
-    margin-left: 5px
+  ul
+    margin: 10px 0
+
+  li
+    margin: 5px 0
 
 .fact-back-share-frame
   color: white
   background-color: $purple
   padding: 10px
+  margin-top: 5px
+  font-size: 12px
 
   strong
     display: block
@@ -86,5 +92,8 @@ $purple: #3a428b
 
   textarea
     width: 100%
+    height: 100px
     display: block
     box-sizing: border-box
+    height: 100px
+    color: black

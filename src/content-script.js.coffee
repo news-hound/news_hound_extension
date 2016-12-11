@@ -1,11 +1,13 @@
 EVIL_THRESHOLD = 30
 WARNING_THRESHOLD = 70
-API_HOST = "https://localhost:3001"
+API_HOST = "https://news-hound-api.herokuapp.com"
 
-popupMessages =
-  evil: "This appears to be highly suspicions for the following reasons:"
-  warning: "This appears to be highly suspicions for the following reasons:"
-  noopinion: "We have not identified this as false.  Here is what we know:"
+strings =
+  popupMessages:
+    evil: "This appears to be highly suspicions for the following reasons:"
+    warning: "This appears to be highly suspicions for the following reasons:"
+    noopinion: "We have not identified this as false.  Here is what we know:"
+  commentPrompt: 'Maybe add a comment? How about starting with...'
 
 popupIcons =
   evil: "fa-exclamation-triangle"
@@ -18,11 +20,10 @@ closePopup = ->
   $('#fact_back_popover').remove()
 
 updateUrlParams = (e) ->
-    if (e.key == 'storage-event')
-        output.innerHTML = e.newValue;
+  if (e.key == 'storage-event')
+    output.innerHTML = e.newValue
 
-
-parseQueryString = (href)=>
+parseQueryString = (href)->
   # console.log("PARSING = #{href}")
   params = {}
   urlParts = href.split('?')
@@ -50,7 +51,7 @@ formatAuthor = (reason)->
 formatReference = (reason)->
   return '' unless reason.reference?
   """
-    <a class="info" href="#{reason.reference}" target="_blank">
+    <a href="#{reason.reference}" target="_blank">
       <i class="fa fa-info-circle"></i>
     </a>
   """
@@ -58,9 +59,15 @@ formatReference = (reason)->
 formatReason = (reason)->
   """
   <li>
-    #{reason.body}
-    #{formatAuthor(reason)}
-    #{formatReference(reason)}
+    <div class="media">
+      <div class="media-body">
+        #{reason.body}
+        #{formatAuthor(reason)}
+      </div>
+      <div class="media-right">
+        #{formatReference(reason)}
+      </div>
+    </div>
   </li>
   """
 
@@ -71,22 +78,26 @@ formatReasons = (reasons)->
 
 formatShareText = (tone, reasons)->
   reasons = _.map(reasons, 'body').join(', ')
-  "#{popupMessages[tone]} #{reasons}"
+  "#{strings.popupMessages[tone]} #{reasons}"
+
+formatShareFrame = (tone, reasons)->
+  return '' if tone == 'noopinion'
+  """
+  <div class="fact-back-share-frame">
+    <strong>#{strings.commentPrompt}</strong>
+    <div>
+      <textarea readonly>#{formatShareText(tone, reasons)}</textarea>
+    </div>
+  </div>
+  """
 
 formatPopoverContent = (tone, reasons)->
   """
-  <strong>#{popupMessages[tone]}</strong>
+  <strong>#{strings.popupMessages[tone]}</strong>
   <ul>
     #{formatReasons(reasons)}
   </ul>
-  <div class="fact-back-share-frame">
-    <strong>Maybe add a comment?</strong>
-    <div>
-      <textarea>
-        #{formatShareText(tone, reasons)}
-      </textarea>
-    </div>
-  </div>
+  #{formatShareFrame(tone, reasons)}
   """
 
 openPopover = (button, tone, reasons)->
@@ -103,6 +114,7 @@ openPopover = (button, tone, reasons)->
     left: "#{buttonOffset.left}px"
   ).addClass(tone)
   $('body').append(popover)
+  $('#fact_back_popover').mouseover((event)-> event.stopPropagation())
 
 buttonScore = (tone, data)->
   return '' if tone == 'noopinion'
@@ -165,7 +177,7 @@ checkFeed = ->
         .parents('.lfloat')
         .append(overlay)
         .find('button')
-        .click (event)->
+        .mouseover (event)->
           event.stopPropagation()
           openPopover(
             $(this)
@@ -177,7 +189,7 @@ cachedGet = (url)->
   if fetchCache[url]
     Promise.resolve(fetchCache[url])
   else
-    httpGet(url, ai)
+    httpGet(url)
     .then (data)->
       fetchCache[url] = data
       data
@@ -185,7 +197,7 @@ cachedGet = (url)->
 httpGet = (url) ->
   console.log("httpGet #{url}")
 
-  # fetch("https://localhost:3001/evaluate?ai=#{ai}&url=#{url}")
+  # fetch(url)
   Promise.resolve(
     success: true
     score: _.random(0, 100)
@@ -202,5 +214,5 @@ httpGet = (url) ->
 
 $(document).ready checkFeed
 setInterval checkFeed, 1000
-window.addEventListener("storage", checkFeed, true);
-$('body').on('click', closePopup)
+window.addEventListener("storage", checkFeed, true)
+$('body').on('mouseover', closePopup)

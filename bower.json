@@ -16,5 +16,8 @@
   "dependencies": {
     "lodash": "4.11.1",
     "jquery": "2.2.3"
+  },
+  "devDependencies": {
+    "bootstrap": "^3.3.7"
   }
 }

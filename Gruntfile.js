@@ -58,14 +58,6 @@ module.exports = function(grunt) {
         files: ['src/**/*.js.coffee', 'spec/**/*.js.coffee'],
         tasks: ['coffee']
       },
-      concat: {
-        files: [
-          'bower_components/**/*.css',
-          'bower_components/**/*.js',
-          'tmp/*.js'
-        ],
-        tasks: ['concat']
-      },
       sass: {
         files: [
           'src/**/*.sass'
@@ -90,7 +82,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask('build', ['coffee', 'concat', 'sass', 'copy']);
-  grunt.registerTask('debug', ['clean', 'build', 'watch'])
+  grunt.registerTask('build', ['coffee', 'sass', 'copy']);
+  grunt.registerTask('debug', ['clean', 'coffeelint', 'build', 'watch'])
   grunt.registerTask('default', ['build']);
 };
